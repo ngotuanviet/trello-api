@@ -11,16 +11,17 @@
     "build": "npm run clean && npm run build-babel",
     "production": "npm run build && node ./build/src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/server.js --inspect"
+    "dev": "nodemon  --exec babel-node src/server.js --inspect"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/runtime": "^7.22.10",
+    "async-exit-hook": "^2.0.1",
     "express": "^5.2.1",
-    "@babel/runtime": "^7.22.10"
+    "mongodb": "^6.21.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14",
     "@babel/cli": "^7.22.10",
     "@babel/core": "^7.22.10",
     "@babel/eslint-parser": "^7.22.10",
@@ -28,6 +29,8 @@
     "@babel/plugin-transform-runtime": "^7.22.10",
     "@babel/preset-env": "^7.22.10",
     "babel-plugin-module-resolver": "^5.0.0",
-    "eslint": "^8.47.0"
+    "dotenv": "^17.4.0",
+    "eslint": "^8.47.0",
+    "nodemon": "^3.1.14"
   }
 }
