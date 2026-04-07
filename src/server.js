@@ -1,17 +1,21 @@
 
-import express from 'express'
+import express, { json } from 'express'
 import exitHook from 'async-exit-hook'
 import { CONNECT_DB, GET_DB } from './config/mongodb.js'
 import { env } from './config/environment.js'
+import { APIs_V1 } from './routes/v1/index.js'
+
 
 const app = express()
-
+app.use(express.json())
 const START_SERVER = () => {
-
-    app.get('/', async (req, res) => {
-        res.send(await GET_DB().listCollections().toArray())
+    app.get('/', (req, res) => {
+        res.send({
+            message: 'Thành công'
+        })
     })
-    app.listen(env.PORT, env.HOSTNAME, () => {
+    app.use('/v1', APIs_V1)
+    app.listen(env.PORT, () => {
         // eslint-disable-next-line no-console, indent
         console.log(`Lắng nghe ở cổng ${env.HOSTNAME}:${process.env.PORT}`)
 
