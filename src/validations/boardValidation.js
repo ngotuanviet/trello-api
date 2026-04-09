@@ -1,5 +1,6 @@
 import Joi from 'joi'
 import { StatusCodes } from 'http-status-codes'
+import ApiError from '../utils/ApiError.js'
 
 const createNew = async (req, res, next) => {
 
@@ -18,19 +19,10 @@ const createNew = async (req, res, next) => {
     await correctCondition.validateAsync(req.body, {
       abortEarly: false
     })
-    // next()
-    res.status(StatusCodes.CREATED).send({
-      message: 'Note: API create new board',
+    next()
 
-    })
   } catch (error) {
-    console.log(error);
-    console.log(new Error(error));
-
-    res.status(StatusCodes.UNPROCESSABLE_ENTITY).send({
-      errors: new Error(error).message
-    })
-
+    next(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message)
   }
 
 }
