@@ -1,13 +1,11 @@
 import { StatusCodes } from 'http-status-codes'
-
+import { boardService } from '../services/broadService.js'
 const createNew = async (req, res, next) => {
-  console.log('====================================');
-  console.log(req.body);
-  console.log('====================================');
-  try {
-    res.status(StatusCodes.CREATED).send({
-      message: 'Note: API create new board',
 
+  try {
+    const createBoard = await boardService.createNew(req.body)
+    res.status(StatusCodes.CREATED).send({
+      createBoard
     })
 
   } catch (error) { next(error) }
