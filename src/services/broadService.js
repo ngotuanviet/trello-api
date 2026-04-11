@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
-import { slugify } from '../utils/formatters.js';
-import ApiError from '../utils/ApiError.js'
+import { slugify } from '../utils/formatters.js'
 
+import { boardModel } from '../models/boardModel.js'
 const createNew = async (reqBody) => {
   try {
     const newBoard = {
@@ -9,12 +9,14 @@ const createNew = async (reqBody) => {
       slug: slugify(reqBody.title)
     }
 
-    // Gọi tới tầng Model để xử lý lưu bản ghi newBoard vào trong Database
-    // ...
+    const createBoard = await boardModel.createNew(newBoard)
+    const getNewBoard = await boardModel.findOneById(createBoard.insertedId)
+
+
 
     // Làm thêm các xử lý logic khác với các Collection khác tùy đặc thù dự án ... vv
     // Bằn email, notification về cho admin khi có 1 cái board mới được tạo ... vv
-    return newBoard
+    return getNewBoard
   } catch (error) {
     throw error
   }
