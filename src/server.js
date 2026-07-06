@@ -6,8 +6,10 @@ import { env } from './config/environment.js'
 import { APIs_V1 } from './routes/v1/index.js'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware.js'
 import cors from 'cors'
-
+import dns from 'node:dns/promises';
 const app = express()
+
+dns.setServers(['1.1.1.1', '1.0.0.1']);
 app.use(cors())
 app.use(express.json())
 const START_SERVER = () => {

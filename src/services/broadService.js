@@ -1,9 +1,9 @@
 /* eslint-disable no-useless-catch */
 import { slugify } from '../utils/formatters.js'
-
 import { boardModel } from '../models/boardModel.js'
 import ApiError from '../utils/ApiError.js'
 import { StatusCodes } from 'http-status-codes'
+import cloneDeep from 'lodash'
 const createNew = async (reqBody) => {
   try {
     const newBoard = {
@@ -22,12 +22,24 @@ const createNew = async (reqBody) => {
 }
 const getDetail = async (id) => {
   try {
-    const board = await boardModel.findOneById(id)
+    const board = await boardModel.getDetails(id)
     if (!board) {
       {
         throw new ApiError(StatusCodes.NOT_FOUND, 'board not found')
       }
     }
+    // cloneDeep để sao chép mảng không ảnh hưởng đến mảng ban đầu
+    // const resBoard = cloneDeep(board)
+    // đưa card về đúng columns
+    // console.log(resBoard.columns);
+
+    board.columns.forEach(column => {
+
+      column.cards = board.cards.filter(card => card.columnId.toString() === column._id.toString())
+    })
+    console.log(board);
+
+    delete board.cards
     return board
   } catch (error) {
     throw error
