@@ -13,6 +13,7 @@ const createNew = async (req, res, next) => {
       'string.trim': 'Title must not have leading or trailing whitespace'
     }),
     description: Joi.string().required().min(3).max(5256).trim().strict(),
+
   })
   try {
     // chỉ định abortEarly: false có nhiều lỗi validation

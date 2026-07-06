@@ -8,6 +8,8 @@ Router.route('/')
     res.status(StatusCodes.OK).send({ message: 'Note API get list boards' })
   })
   .post(boardValidation.createNew, boardController.createNew)
-
+Router.route('/:id')
+  .get(boardController.getDetail)
+// .put()
 
 export const boardRoute = Router

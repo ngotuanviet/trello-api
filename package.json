@@ -18,6 +18,7 @@
   "dependencies": {
     "@babel/runtime": "^7.22.10",
     "async-exit-hook": "^2.0.1",
+    "cors": "^2.8.6",
     "cross-env": "^10.1.0",
     "express": "^5.2.1",
     "http-status-code": "^2.1.0",
