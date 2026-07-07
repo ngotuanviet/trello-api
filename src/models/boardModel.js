@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { ObjectId } from 'mongodb'
+import { ObjectId, ReturnDocument } from 'mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 import { GET_DB } from '../config/mongodb.js'
 import { BOARD_TYPES } from '../utils/constants.js'
@@ -68,9 +68,21 @@ const getDetails = async (id) => {
         }
       }
     ]).toArray()
+    console.log(result[0]);
 
 
     return result[0] || null
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+// Nhiệm vụ hàm này push 1 giá trị columnId và cuối mảng columnOrderIds
+const pushColumnOrderIds = async (column) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate({ _id: new ObjectId(column.boardId) }, { $push: { columnOrderIds: new ObjectId(column._id) } }, {
+      ReturnDocument: 'after'
+    })
+    return result.value || null
   } catch (error) {
     throw new Error(error)
   }
@@ -80,7 +92,7 @@ export const boardModel = {
   BOARD_COLLECTION_SCHEMA,
   createNew,
   findOneById
-  , getDetails
+  , getDetails, pushColumnOrderIds
 }
 // boardId: 6a4b65841f2db783506bbb9d
 // columnId: 6a4b6c04dcac4aebdb6c12d5

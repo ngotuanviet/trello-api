@@ -37,7 +37,7 @@ const getDetail = async (id) => {
 
       column.cards = board.cards.filter(card => card.columnId.toString() === column._id.toString())
     })
-    console.log(board);
+
 
     delete board.cards
     return board
