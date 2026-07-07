@@ -17,7 +17,7 @@ const createNew = async (reqBody) => {
     // Bằn email, notification về cho admin khi có 1 cái board mới được tạo ... vv
     return getNewBoard
   } catch (error) {
-    throw error
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi tạo board mới')
   }
 }
 const getDetail = async (id) => {
@@ -25,7 +25,7 @@ const getDetail = async (id) => {
     const board = await boardModel.getDetails(id)
     if (!board) {
       {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'board not found')
+        throw new ApiError(StatusCodes.NOT_FOUND, 'board không tồn tại')
       }
     }
     // cloneDeep để sao chép mảng không ảnh hưởng đến mảng ban đầu
@@ -42,7 +42,8 @@ const getDetail = async (id) => {
     delete board.cards
     return board
   } catch (error) {
-    throw error
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi tìm board mới')
+
   }
 }
 export const boardService = {
