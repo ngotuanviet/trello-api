@@ -9,7 +9,7 @@ const createNew = async (req, res, next) => {
     boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     columnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     title: Joi.string().required().min(3).max(50).trim().strict(),
-    description: Joi.string().optional()
+    // description: Joi.string().optional()
   })
   try {
     // chỉ định abortEarly: false có nhiều lỗi validation
