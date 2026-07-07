@@ -2,6 +2,7 @@
 
 import Joi from 'joi'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
+import { GET_DB } from '../config/mongodb.js'
 
 // Define Collection (name & schema)
 const COLUMN_COLLECTION_NAME = 'columns'
@@ -18,8 +19,22 @@ const COLUMN_COLLECTION_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false)
 })
-
+const validateBeforeCreate = async (data) => {
+  return await COLUMN_COLLECTION_SCHEMA.validateAsync(data, {
+    abortEarly: false
+  })
+}
+const createNew = async (data) => {
+  try {
+    const validData = await validateBeforeCreate(data)
+    const createColumn = await GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne(validData)
+    return createColumn
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
-  COLUMN_COLLECTION_SCHEMA
+  COLUMN_COLLECTION_SCHEMA,
+  createNew
 }
