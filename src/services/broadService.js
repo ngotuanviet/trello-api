@@ -46,7 +46,21 @@ const getDetail = async (id) => {
 
   }
 }
+const update = async (boardId, data) => {
+  try {
+    const updateData = {
+      ...data,
+      updatedAt: Date.now()
+    }
+    const updatedBoard = await boardModel.update(boardId, updateData)
+    return updatedBoard
+  } catch (error) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi tìm board mới')
+
+  }
+}
 export const boardService = {
   createNew,
-  getDetail
+  getDetail,
+  update
 }
