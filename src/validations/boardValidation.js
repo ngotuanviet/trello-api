@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import ApiError from '../utils/ApiError.js'
 import { type } from 'node:os'
 import { BOARD_TYPES } from '../utils/constants.js'
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 
 const createNew = async (req, res, next) => {
 
@@ -51,6 +52,27 @@ const update = async (req, res, next) => {
     next(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message)
   }
 }
+const moveCardToDifferentColumns = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    currentCardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    prevColumnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    prevCardOrderIds: Joi.array().items(
+      Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+    ).required(),
+    nextColumnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    nextCardOrderIds: Joi.array().items(
+      Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+    ).required()
+  })
+
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
+  }
+}
+
 export const boardValidation = {
-  createNew, update
+  createNew, update, moveCardToDifferentColumns
 }

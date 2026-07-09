@@ -56,15 +56,37 @@ const getDetails = async (id) => {
       }, {
         $lookup: {
           from: columnModel.COLUMN_COLLECTION_NAME,
-          localField: '_id',
-          foreignField: 'boardId',
+          let: { board_id: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $eq: ['$boardId', '$$board_id'] },
+                    { $eq: ['$boardId', { $toString: '$$board_id' }] }
+                  ]
+                }
+              }
+            }
+          ],
           as: 'columns'
         }
       }, {
         $lookup: {
           from: cardModel.CARD_COLLECTION_NAME,
-          localField: '_id',
-          foreignField: 'boardId',
+          let: { board_id: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $eq: ['$boardId', '$$board_id'] },
+                    { $eq: ['$boardId', { $toString: '$$board_id' }] }
+                  ]
+                }
+              }
+            }
+          ],
           as: 'cards'
         }
       }

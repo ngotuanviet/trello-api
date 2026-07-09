@@ -30,8 +30,10 @@ const createNew = async (data) => {
 
     const validData = await validateBeforeCreate(data)
     const newDataColumn = {
+      boardId: new ObjectId(validData.boardId),
+
       ...validData,
-      boardId: new ObjectId(validData.boardId)
+
     }
     const createColumn = await GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne(newDataColumn)
     return createColumn

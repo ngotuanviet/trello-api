@@ -54,26 +54,6 @@ const update = async (boardId, data) => {
       ...data,
       updatedAt: Date.now()
     }
-    
-    // Nếu có case kéo thả card qua column khác
-    if (updateData.currentCardId && updateData.prevColumnId && updateData.nextColumnId) {
-      // 1. Cập nhật mảng cardOrderIds của column cũ
-      await columnModel.update(updateData.prevColumnId, {
-        cardOrderIds: updateData.prevCardOrderIds
-      })
-
-      // 2. Cập nhật mảng cardOrderIds của column mới
-      await columnModel.update(updateData.nextColumnId, {
-        cardOrderIds: updateData.nextCardOrderIds
-      })
-
-      // 3. Cập nhật columnId của card đã kéo
-      await cardModel.update(updateData.currentCardId, {
-        columnId: updateData.nextColumnId
-      })
-
-      return { updateResult: 'Successfully' }
-    }
 
     const updatedBoard = await boardModel.update(boardId, updateData)
     return updatedBoard
@@ -81,8 +61,33 @@ const update = async (boardId, data) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi cập nhật board')
   }
 }
+const moveCardToDifferentColumns = async (reqBody) => {
+  try {
+    // 1. Cập nhật mảng cardOrderIds của column cũ
+    await columnModel.update(reqBody.prevColumnId, {
+      cardOrderIds: reqBody.prevCardOrderIds
+    })
+
+    // 2. Cập nhật mảng cardOrderIds của column mới
+    await columnModel.update(reqBody.nextColumnId, {
+      cardOrderIds: reqBody.nextCardOrderIds,
+      updatedAt: Date.now()
+    })
+
+    // 3. Cập nhật columnId của card đã kéo
+    await cardModel.update(reqBody.currentCardId, {
+      columnId: reqBody.nextColumnId,
+      updatedAt: Date.now()
+    })
+
+    return { updateResult: 'Successfully' }
+  } catch (error) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi di chuyển card')
+  }
+}
 export const boardService = {
   createNew,
   getDetail,
-  update
+  update,
+  moveCardToDifferentColumns
 }
