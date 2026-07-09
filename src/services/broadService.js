@@ -1,6 +1,8 @@
 /* eslint-disable no-useless-catch */
 import { slugify } from '../utils/formatters.js'
 import { boardModel } from '../models/boardModel.js'
+import { columnModel } from '../models/columnModel.js'
+import { cardModel } from '../models/cardModel.js'
 import ApiError from '../utils/ApiError.js'
 import { StatusCodes } from 'http-status-codes'
 import cloneDeep from 'lodash'
@@ -52,11 +54,31 @@ const update = async (boardId, data) => {
       ...data,
       updatedAt: Date.now()
     }
+    
+    // Nếu có case kéo thả card qua column khác
+    if (updateData.currentCardId && updateData.prevColumnId && updateData.nextColumnId) {
+      // 1. Cập nhật mảng cardOrderIds của column cũ
+      await columnModel.update(updateData.prevColumnId, {
+        cardOrderIds: updateData.prevCardOrderIds
+      })
+
+      // 2. Cập nhật mảng cardOrderIds của column mới
+      await columnModel.update(updateData.nextColumnId, {
+        cardOrderIds: updateData.nextCardOrderIds
+      })
+
+      // 3. Cập nhật columnId của card đã kéo
+      await cardModel.update(updateData.currentCardId, {
+        columnId: updateData.nextColumnId
+      })
+
+      return { updateResult: 'Successfully' }
+    }
+
     const updatedBoard = await boardModel.update(boardId, updateData)
     return updatedBoard
   } catch (error) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi tìm board mới')
-
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi cập nhật board')
   }
 }
 export const boardService = {

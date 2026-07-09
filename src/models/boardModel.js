@@ -94,6 +94,11 @@ const update = async (boardId, updateData) => {
         throw new Error(`Không được cập nhật trường : ${JSON.stringify(updateData[fieldName])}`)
       }
     })
+
+    if (updateData.columnOrderIds) {
+      updateData.columnOrderIds = updateData.columnOrderIds.map(_id => (new ObjectId(_id)))
+    }
+
     const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate({ _id: new ObjectId(boardId) }, { $set: updateData }, {
       ReturnDocument: 'after'
     })
