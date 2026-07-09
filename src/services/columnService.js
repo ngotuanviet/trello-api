@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import ApiError from '../utils/ApiError.js'
 import { columnModel } from '../models/columnModel.js'
 import { boardModel } from '../models/boardModel.js'
+import { cardModel } from '../models/cardModel.js'
 
 const createNew = async (reqBody) => {
   try {
@@ -32,4 +33,18 @@ const update = async (columnId, data) => {
 
   }
 }
-export const columnService = { createNew, update }
+const deleteColumn = async (columnId) => {
+  try {
+
+    await columnModel.deleteOneById(columnId)
+    await cardModel.deleteManyByColumnId(columnId)
+    return {
+      StatusCode: 200,
+      deleteResult: 'Column and its Cards deleted successfully!'
+    }
+  } catch (error) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi tìm board mới')
+
+  }
+}
+export const columnService = { createNew, update, deleteColumn }
