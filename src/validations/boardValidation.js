@@ -1,7 +1,6 @@
 import Joi from 'joi'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../utils/ApiError.js'
-import { type } from 'node:os'
 import { BOARD_TYPES } from '../utils/constants.js'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 
