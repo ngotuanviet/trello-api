@@ -19,4 +19,17 @@ const createNew = async (reqBody) => {
     )
   }
 }
-export const columnService = { createNew }
+const update = async (columnId, data) => {
+  try {
+    const updateData = {
+      ...data,
+      updatedAt: Date.now()
+    }
+    const updatedColumn = await columnModel.update(columnId, updateData)
+    return updatedColumn
+  } catch (error) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi tìm board mới')
+
+  }
+}
+export const columnService = { createNew, update }

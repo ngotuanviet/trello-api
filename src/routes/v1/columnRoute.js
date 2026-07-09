@@ -7,5 +7,6 @@ Router.route('/')
     res.send('hello')
   })
   .post(columnValidation.createNew, columnController.createNew)
-
+Router.route('/:id')
+  .put(columnValidation.update, columnController.update)
 export default Router

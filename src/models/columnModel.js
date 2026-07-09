@@ -60,8 +60,26 @@ const findOneById = async (id) => {
     throw new Error(error)
   }
 }
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt', 'boardId']
+const update = async (columnId, updateData) => {
+  try {
+    // Lọc các field không cho phép trong INVALID_UPDATE_FIELDS
+    Object.keys(updateData).forEach(fieldName => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updateData[fieldName]
+        throw new Error(`Không được cập nhật trường : ${JSON.stringify(updateData[fieldName])}`)
+      }
+    })
+    const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate({ _id: new ObjectId(columnId) }, { $set: updateData }, {
+      ReturnDocument: 'after'
+    })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
-  createNew, findOneById, pushCardOrderIds
+  createNew, findOneById, pushCardOrderIds, update
 }
