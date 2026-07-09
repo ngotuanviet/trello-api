@@ -35,9 +35,14 @@ const update = async (columnId, data) => {
 }
 const deleteColumn = async (columnId) => {
   try {
-
+    const targetColumn = await columnModel.findOneById(columnId)
+    if (!targetColumn) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Column not found!')
+    }
     await columnModel.deleteOneById(columnId)
     await cardModel.deleteManyByColumnId(columnId)
+    // Xoá columnID trong mảng columnOrderIds của board chứa nó
+    await boardModel.pullColumnOrderIds(targetColumn)
     return {
       StatusCode: 200,
       deleteResult: 'Column and its Cards deleted successfully!'

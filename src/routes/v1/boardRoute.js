@@ -14,5 +14,5 @@ Router.route('/supports/moving_card')
 Router.route('/:id')
   .get(boardController.getDetail)
   .put(boardValidation.update, boardController.update)
-
+  .delete(boardValidation.deleteBoardColumnIds, boardController.update)
 export const boardRoute = Router

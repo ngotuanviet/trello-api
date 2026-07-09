@@ -71,7 +71,27 @@ const moveCardToDifferentColumns = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
   }
 }
+const deleteBoardColumnIds = async (req, res, next) => {
 
+  const correctCondition = Joi.object({
+    title: Joi.string().min(3).max(50).trim().strict(),
+    description: Joi.string().min(3).max(5256).trim().strict(),
+    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE)
+
+  })
+  try {
+    // chỉ định abortEarly: false có nhiều lỗi validation
+    // đối với trường hợp update, cho phép Unknown để không cần đầy một số Field lên
+    await correctCondition.validateAsync(req.body, {
+      abortEarly: false,
+      allowUnknown: true
+    })
+    next()
+
+  } catch (error) {
+    next(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message)
+  }
+}
 export const boardValidation = {
-  createNew, update, moveCardToDifferentColumns
+  createNew, update, moveCardToDifferentColumns, deleteBoardColumnIds
 }
