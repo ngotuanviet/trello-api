@@ -21,11 +21,20 @@ const START_SERVER = () => {
     app.use('/v1', APIs_V1)
     // Middleware xử lý lỗi tập trung
     app.use(errorHandlingMiddleware)
-    app.listen(env.PORT, () => {
-        // eslint-disable-next-line no-console, indent
-        console.log(`Lắng nghe ở cổng ${env.HOSTNAME}:${process.env.PORT}`)
+    if (env.BUILD_MODE === 'production') {
+        app.listen(env.PORT, () => {
+            // eslint-disable-next-line no-console, indent
+            console.log(`Lắng nghe ở cổng:${process.env.PORT}`)
 
-    })
+        })
+    } else {
+        app.listen(env.PORT, () => {
+            // eslint-disable-next-line no-console, indent
+            console.log(`Dev: Lắng nghe ở cổng ${env.HOSTNAME}:${process.env.PORT}`)
+
+        })
+    }
+
     exitHook(() => {
 
         console.log('Exiting app');
