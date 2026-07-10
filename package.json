@@ -2,7 +2,6 @@
   "name": "trello-api",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "src/server.js",
   "scripts": {
     "lint": "eslint src --ext js --report-unused-disable-directives --max-warnings 0",
