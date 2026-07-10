@@ -1,5 +1,5 @@
 export const WHITELIST_DOMAINS = [
-  'https://trello-client-qkn9gpkbg-blackcats-projects.vercel.app/'
+  'trello-client-mu.vercel.app'
   // 'http://localhost:5173'
   // Không cần localhost nữa vi o file config/cors đã luôn luôn cho phep môi trường
   //dev(env.BUILD_MODE === 'dev')
