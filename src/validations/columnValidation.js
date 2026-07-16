@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import { StatusCodes } from 'http-status-codes'
-
+import ApiError from '../utils/ApiError.js'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 
 const createNew = async (req, res, next) => {
@@ -23,7 +23,7 @@ const createNew = async (req, res, next) => {
     next()
 
   } catch (error) {
-    next(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message)
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
   }
 
 }
@@ -48,7 +48,7 @@ const update = async (req, res, next) => {
     next()
 
   } catch (error) {
-    next(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message)
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
   }
 }
 const deleteColumn = async (req, res, next) => {
@@ -64,7 +64,7 @@ const deleteColumn = async (req, res, next) => {
     next()
 
   } catch (error) {
-    next(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message)
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
   }
 }
 export const columnValidation = {

@@ -26,7 +26,7 @@ const createNew = async (req, res, next) => {
     next()
 
   } catch (error) {
-    next(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message)
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
   }
 
 }
@@ -48,7 +48,7 @@ const update = async (req, res, next) => {
     next()
 
   } catch (error) {
-    next(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message)
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
   }
 }
 const moveCardToDifferentColumns = async (req, res, next) => {
@@ -89,7 +89,7 @@ const deleteBoardColumnIds = async (req, res, next) => {
     next()
 
   } catch (error) {
-    next(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message)
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
   }
 }
 export const boardValidation = {

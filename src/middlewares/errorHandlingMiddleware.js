@@ -3,6 +3,13 @@ import { env } from '../config/environment.js'
 
 // Middleware xử lý lỗi tập trung trong ứng dụng Back-end NodeJS (ExpressJS)
 export const errorHandlingMiddleware = (err, req, res, next) => {
+  // Đảm bảo err luôn là một object để tránh lỗi TypeError khi gán thuộc tính (ví dụ: khi dev gọi next(422))
+  if (!err || typeof err !== 'object') {
+    err = {
+      statusCode: typeof err === 'number' ? err : StatusCodes.INTERNAL_SERVER_ERROR,
+      message: typeof err === 'string' ? err : 'Unknown Error'
+    }
+  }
 
   // Nếu dev không cẩn thận thiếu statusCode thì mặc định sẽ để code 500 INTERNAL_SERVER_ERROR
   if (!err.statusCode) err.statusCode = StatusCodes.INTERNAL_SERVER_ERROR
