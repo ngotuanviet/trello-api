@@ -25,7 +25,7 @@ const createNew = async (reqBody, res, next) => {
     // Thực hiện lưu thông tin user vào DataBase
     const createdUser = await userModel.createNew(newUser)
     // Gửi email cho người dùng xác thực tk
-    const getNewUser = await userModel.findOneById(createdUser.insertedId).select('-password')
+    const getNewUser = await userModel.findOneById(createdUser.insertedId)
 
     return pickUser(getNewUser)
   } catch (error) {
