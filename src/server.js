@@ -8,12 +8,20 @@ import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware.j
 import cors from 'cors'
 import dns from 'node:dns/promises';
 import { corsOptions } from '~/config/cors.js'
+import cookieParser from 'cookie-parser'
 const app = express()
 
 dns.setServers(['1.1.1.1', '1.0.0.1']);
 app.use(cors(corsOptions))
 app.use(express.json())
+// Cấu hinh cookie parser
+app.use(cookieParser())
 const START_SERVER = () => {
+    // Fix cache from disk của expressJS
+    app.use((req, res, next) => {
+        res.set('Cache-Control', 'no-store')
+        next()
+    })
     app.get('/', (req, res) => {
         res.send({
             message: 'Thành công'
