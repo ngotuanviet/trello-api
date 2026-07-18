@@ -48,7 +48,7 @@ const deleteColumn = async (columnId) => {
       deleteResult: 'Column and its Cards deleted successfully!'
     }
   } catch (error) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi tìm board mới')
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Error Delete Column')
 
   }
 }
