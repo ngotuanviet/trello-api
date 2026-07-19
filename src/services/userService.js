@@ -137,4 +137,36 @@ const refreshToken = async (refreshToken) => {
     throw error
   }
 }
-export const userService = { createNew, verifyAccount, login, refreshToken }
+const update = async (id, reqBody) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    // Kiểm tra chắc chắn tài khoản tồn tại và được active
+    const exitsUser = await userModel.findOneById(id)
+    if (!exitsUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Account not found')
+    if (!exitsUser.isActive) throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your account is not active!')
+    // Khởi tạo updated user ban đầu là empty
+    let updateUser = {}
+    // Trường hợp change Password
+    if (reqBody.current_password && reqBody.new_password) {
+      // Kiếm tra xem current_password có đúng hay ko
+      if (!bcrypt.compareSync(reqBody.current_password, exitsUser.password)) {
+        throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your Current Password is incorrect!')
+      }
+      // Nếu như current_password đúng thì sẽ hash mật khẩu mới vào DB
+      updateUser = await userModel.update(exitsUser._id, {
+        password: bcrypt.hashSync(reqBody.new_password, 10)
+      })
+    } else {
+      // Trường hợp update các thông tin chung displayName
+      updateUser = await userModel.update(exitsUser._id, {
+        displayName: reqBody.displayName
+      })
+    }
+    return pickUser(updateUser)
+  } catch (error) {
+    throw error
+  }
+
+
+}
+export const userService = { createNew, verifyAccount, login, refreshToken, update }
