@@ -1,4 +1,4 @@
-import { StatusCodes } from "http-status-codes";
+import { StatusCodes } from 'http-status-codes';
 import { env } from '~/config/environment';
 import { JwtProvider } from '~/providers/JwtProvider';
 import ApiError from '~/utils/ApiError';
