@@ -8,6 +8,7 @@ import { WEBSITE_DOMAIN } from '~/utils/constants'
 import { ResendProvider } from '~/providers/ResendProvider'
 import { JwtProvider } from '~/providers/JwtProvider'
 import { env } from '~/config/environment'
+import { CloudinaryProvider } from '~/providers/CloudinaryProvider'
 const createNew = async (reqBody, res, next) => {
 
   try {
@@ -137,7 +138,7 @@ const refreshToken = async (refreshToken) => {
     throw error
   }
 }
-const update = async (id, reqBody) => {
+const update = async (id, reqBody, userAvatar) => {
   // eslint-disable-next-line no-useless-catch
   try {
     // Kiểm tra chắc chắn tài khoản tồn tại và được active
@@ -156,6 +157,17 @@ const update = async (id, reqBody) => {
       updateUser = await userModel.update(exitsUser._id, {
         password: bcrypt.hashSync(reqBody.new_password, 10)
       })
+    } else if (userAvatar) {
+      // trường hợp upload file lên cloud 
+
+
+      const uploadResult = await CloudinaryProvider.streamUpload(userAvatar.buffer, 'users')
+      // console.log("🚀 ~ update ~ uploadResult:", uploadResult)
+      // lưu lại url (secure_url) của file ảnh vào trong DB
+      updateUser = await userModel.update(exitsUser._id, {
+        avatar: uploadResult.secure_url
+      })
+
     } else {
       // Trường hợp update các thông tin chung displayName
       updateUser = await userModel.update(exitsUser._id, {
