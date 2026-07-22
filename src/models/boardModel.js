@@ -5,6 +5,7 @@ import { GET_DB } from '../config/mongodb.js'
 import { BOARD_TYPES } from '../utils/constants.js'
 import { columnModel } from '../models/columnModel.js'
 import { cardModel } from '../models/cardModel.js'
+import { pagingSkipValue } from '~/utils/algorithms.js'
 
 
 // define collection
@@ -15,6 +16,10 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   description: Joi.string().required().min(3).max(255).trim().strict(),
   type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required(),
   columnOrderIds: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)).default([]),
+  //những admin của  board
+  ownerIds: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)).default([]),
+  // những thành viên của board
+  memberIds: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)).default([]),
   createAt: Joi.date().timestamp('javascript').default(Date.now()),
   updateAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false)
@@ -26,10 +31,15 @@ const validateBeforeCreate = async (data) => {
     abortEarly: false
   })
 }
-const createNew = async (data) => {
+const createNew = async (userId, data) => {
   try {
     const validData = await validateBeforeCreate(data)
-    const createBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
+    const newBoardToAdd = {
+
+      ...validData,
+      ownerIds: [new ObjectId(userId)]
+    }
+    const createBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(newBoardToAdd)
     return createBoard
   } catch (error) {
     throw new Error(error)
@@ -44,14 +54,27 @@ const findOneById = async (id) => {
     throw new Error(error)
   }
 }
-const getDetails = async (id) => {
+const getDetails = async (userId, boardId) => {
   try {
+
+
+    const queryConditions = [
+      { _id: new ObjectId(boardId) },
+      {
+        _destroy: false
+      },
+      {
+        $or: [
+          { ownerIds: { $all: [new ObjectId(userId)] } },
+          { memberIds: { $all: [new ObjectId(userId)] } }
+        ]
+      }]
+
     // return await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
     const result = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([
       {
         $match: {
-          _id: new ObjectId(id),
-          _destroy: false
+          $and: queryConditions
         }
       }, {
         $lookup: {
@@ -141,13 +164,67 @@ const pullColumnOrderIds = async (column) => {
     throw new Error(error)
   }
 }
+const getBoards = async (userId, page, itemsPerPage) => {
+  try {
+    const queryConditions = [
+      // Đièu kiện 1: Board chưa bị xoá
+      {
+        _destroy: false
+      },
+      // Điều kiện 02: cái thằng userId đang thực hiện request nay no phai thuộc vào một trong 2 cái mang ownerIds hoac memberIds, su dung toan tu Sall cua mongodb
 
+      {
+        $or: [
+          { ownerIds: { $all: [new ObjectId(userId)] } },
+          { memberIds: { $all: [new ObjectId(userId)] } }
+        ]
+      }]
+    const query = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate(
+      [
+        {
+          $match: {
+            $and: queryConditions
+          }
+        },
+        // sort title cua board theo A-Z (mac dinh se bị chữ B hoa đứng trước chữ a thường (theo chuan bang ma ASCII)
+        { $sort: { title: 1 } },
+        // $facet xử lý nhiều luồng trong một query
+        {
+          $facet: {
+            // Luồng thứ nhất: Query boards \
+            'queryBoards': [
+              { $skip: pagingSkipValue(page, itemsPerPage) }, // bả qua số lương bản ghi của những page trước đó
+              { $limit: itemsPerPage } // Giới hạn tối đa số lượng bản ghi trả về trên 1 trang
+            ],
+
+            // Luồng thứ hai: Query đến tổng số lượng bản ghi board trong database và trả về biến countedAllBoards
+            'queryTotalBoards': [{ $count: 'countedAllBoards' }]
+          }
+        }
+      ],
+      // Khai báo thêm thuộc tính collation locale 'en' để fix chứ B hoa và chữ a thường ở trên
+      // https://www.mongodb.com/docs/v6.0/reference/collation/#std-label-collation-document-fields
+      {
+        collation: { locale: 'en' }
+      }
+    ).toArray()
+    // console.log("🚀 ~ getBoards ~ query:", query)
+    const res = query[0]
+    return {
+      boards: res.queryBoards || [],
+      totalBoards: res.queryTotalBoards[0]?.countedAllBoards || 0
+
+    }
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
   createNew,
   findOneById
-  , getDetails, pushColumnOrderIds, update, pullColumnOrderIds
+  , getDetails, pushColumnOrderIds, update, pullColumnOrderIds, getBoards
 }
 // boardId: 6a4b65841f2db783506bbb9d
 // columnId: 6a4b6c04dcac4aebdb6c12d5

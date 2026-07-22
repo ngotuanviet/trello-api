@@ -3,7 +3,8 @@ import { boardService } from '../services/broadService.js'
 const createNew = async (req, res, next) => {
 
   try {
-    const createBoard = await boardService.createNew(req.body)
+    const userId = req.jwtDecoded._id
+    const createBoard = await boardService.createNew(userId, req.body)
     res.status(StatusCodes.CREATED).send({
       createBoard
     })
@@ -11,9 +12,11 @@ const createNew = async (req, res, next) => {
   } catch (error) { next(error) }
 }
 const getDetail = async (req, res, next) => {
-  const { id } = req.params
+
   try {
-    const board = await boardService.getDetail(id)
+    const { id } = req.params
+    const userId = req.jwtDecoded._id
+    const board = await boardService.getDetail(userId, id)
     res.status(StatusCodes.OK).send({
       board
     })
@@ -37,7 +40,18 @@ const moveCardToDifferentColumns = async (req, res, next) => {
     res.status(StatusCodes.OK).json(result)
   } catch (error) { next(error) }
 }
+const getBoards = async (req, res, next) => {
+  try {
+    const userId = req.jwtDecoded._id
+    // page va itemsPerPage dược truyền vào trong query url từ phía FE nên BE sẽ lầy thông qua req.query
+    const { page, itemsPerPage } = req.query
+    const results = await boardService.getBoards(userId, page, itemsPerPage)
+    res.status(StatusCodes.OK).json(results)
+  } catch (error) {
+    next(error)
+  }
+}
 export const boardController = {
   createNew,
-  getDetail, update, moveCardToDifferentColumns
+  getDetail, update, moveCardToDifferentColumns, getBoards
 }

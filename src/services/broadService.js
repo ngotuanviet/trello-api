@@ -6,14 +6,15 @@ import { cardModel } from '../models/cardModel.js'
 import ApiError from '../utils/ApiError.js'
 import { StatusCodes } from 'http-status-codes'
 import cloneDeep from 'lodash'
-const createNew = async (reqBody) => {
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants.js'
+const createNew = async (userId, reqBody) => {
   try {
     const newBoard = {
       ...reqBody,
       slug: slugify(reqBody.title)
     }
 
-    const createBoard = await boardModel.createNew(newBoard)
+    const createBoard = await boardModel.createNew(userId, newBoard)
     const getNewBoard = await boardModel.findOneById(createBoard.insertedId.toString())
     // Làm thêm các xử lý logic khác với các Collection khác tùy đặc thù dự án ... vv
     // Bằn email, notification về cho admin khi có 1 cái board mới được tạo ... vv
@@ -22,9 +23,9 @@ const createNew = async (reqBody) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi tạo board mới')
   }
 }
-const getDetail = async (id) => {
+const getDetail = async (userId, id) => {
   try {
-    const board = await boardModel.getDetails(id)
+    const board = await boardModel.getDetails(userId, id)
     if (!board) {
       {
         throw new ApiError(StatusCodes.NOT_FOUND, 'board không tồn tại')
@@ -85,9 +86,19 @@ const moveCardToDifferentColumns = async (reqBody) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi di chuyển card')
   }
 }
+const getBoards = async (userId, page, itemsPerPage) => {
+  try {
+    if (!page) page = DEFAULT_PAGE
+    if (!itemsPerPage) itemsPerPage = DEFAULT_ITEMS_PER_PAGE
+    const result = await boardModel.getBoards(userId, parseInt(page, 10), parseInt(itemsPerPage, 10))
+    return result
+  } catch (error) {
+    throw error
+  }
+}
 export const boardService = {
   createNew,
   getDetail,
   update,
-  moveCardToDifferentColumns
+  moveCardToDifferentColumns, getBoards
 }
