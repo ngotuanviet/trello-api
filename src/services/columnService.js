@@ -28,7 +28,7 @@ const update = async (columnId, data) => {
       ...data,
       updatedAt: Date.now()
     }
-    console.log(updateData);
+
     const updatedColumn = await columnModel.update(columnId, updateData)
     return updatedColumn
   } catch (error) {
