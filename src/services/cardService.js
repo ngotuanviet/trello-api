@@ -17,7 +17,7 @@ const createNew = async (reqBody) => {
     )
   }
 }
-const update = async (cardId, reqBody, cardCoverFile) => {
+const update = async (cardId, reqBody, cardCoverFile, userInfo) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const updateData = {
@@ -32,6 +32,16 @@ const update = async (cardId, reqBody, cardCoverFile) => {
       updatedCard = await cardModel.update(cardId, {
         cover: uploadResult.secure_url
       })
+    } else if (updateData.commentToAdd) {
+      // Tạo dữ liệu trong comment để thêm vào DB, cần bổ sung thêm những field cần thiết
+
+      const commentData = {
+        userId: userInfo._id,
+        userEmail: userInfo.email,
+        ...updateData.commentToAdd,
+        commentedAt: Date.now()
+      }
+      updatedCard = await cardModel.unshiftNewComment(cardId, commentData)
     }
     else {
       // các trường hợp update chung như title description
