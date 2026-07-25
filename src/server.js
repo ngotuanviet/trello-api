@@ -10,7 +10,11 @@ import dns from 'node:dns/promises';
 import { corsOptions } from '~/config/cors.js'
 import cookieParser from 'cookie-parser'
 const app = express()
-
+// Xử lý socket real-time voi gói socket.io
+// https://socket.io/get-started/chat/#integrating-socketio
+import socketIo from 'socket.io'
+import http from 'http'
+import { inviteUserToBoardSocket } from '~/sockets/inviteUserToBoardSocket.js'
 dns.setServers(['1.1.1.1', '1.0.0.1']);
 app.use(cors(corsOptions))
 app.use(express.json())
@@ -30,14 +34,24 @@ const START_SERVER = () => {
     app.use('/v1', APIs_V1)
     // Middleware xử lý lỗi tập trung
     app.use(errorHandlingMiddleware)
+
+    // Tạo 1 server mới bọc app express để làm real-time với socket.io
+    const server = http.createServer(app)
+    // Khởi tạo biến io với server và cors
+    const io = socketIo(server, { cors: corsOptions })
+    io.on('connection', (socket) => {
+        // Gọi các socket tuỳ theo tính năng ở đây.
+        inviteUserToBoardSocket(socket)
+    })
     if (env.BUILD_MODE === 'production') {
-        app.listen(env.PORT, () => {
+        // Dùng server.listen thay vì app.listen vì lúc này server đã bao gom express app và dã config socket.io
+        server.listen(env.PORT, () => {
             // eslint-disable-next-line no-console, indent
             console.log(`Lắng nghe ở cổng:${process.env.PORT}`)
 
         })
     } else {
-        app.listen(env.PORT, () => {
+        server.listen(env.PORT, () => {
             // eslint-disable-next-line no-console, indent
             console.log(`Dev: Lắng nghe ở cổng ${env.HOSTNAME}:${process.env.PORT}`)
 
