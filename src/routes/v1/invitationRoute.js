@@ -8,4 +8,9 @@ Router.route('/board')
     invitationValidation.createNewBoardInvitation,
     invitationController.createNewBoardInvitation
   )
+// của user hiện tại
+Router.route('/')
+  .get(authMiddleware.isAuthorized,
+    invitationController.getInvitations
+  )
 export default Router

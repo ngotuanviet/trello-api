@@ -48,7 +48,31 @@ const createNewBoardInvitation = async (reqBody, inviterId) => {
     throw error
   }
 }
+const getInvitations = async (userId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const getInvitations = await invitationModel.findByUser(userId)
+    // console.log("🚀 ~ getInvitations ~ getInvitations:", getInvitations)
 
+    // Vì các dữ liệu inviter, invite và board là đang ở giá trị mảng 1 phần tử nếu lấy ra được nên chúng ta biến đồi nó về Json Object trước khi trả về
+    const resInvitation = getInvitations.map((i) => ({
+      ...i,
+      inviter: i.inviter[0] || {},
+      invitee: i.invitee[0] || {},
+      board: i.board[0] || {},
+
+    }))
+
+
+    // console.log(resInvitation);
+
+    return resInvitation || []
+
+  } catch (error) {
+    throw error
+  }
+
+}
 export const invitationService = {
-  createNewBoardInvitation
+  createNewBoardInvitation, getInvitations
 }
