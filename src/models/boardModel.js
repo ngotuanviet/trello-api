@@ -183,7 +183,7 @@ const pullColumnOrderIds = async (column) => {
     throw new Error(error)
   }
 }
-const getBoards = async (userId, page, itemsPerPage) => {
+const getBoards = async (userId, page, itemsPerPage, queryFilter) => {
   try {
     const queryConditions = [
       // Đièu kiện 1: Board chưa bị xoá
@@ -198,6 +198,22 @@ const getBoards = async (userId, page, itemsPerPage) => {
           { memberIds: { $all: [new ObjectId(userId)] } }
         ]
       }]
+    // Xử lý query filter cho từng trường hợp search board VD set theo title
+    if (queryFilter) {
+
+      Object.keys(queryFilter).forEach((key) => {
+        // queryFilters[key] ví dụ queryFilters[title] nều phía FE đầy lên q[title]
+        // Có phân biệt chữ hoa chữ thường
+        // queryConditions.push({
+        //   [key]: { $regex: queryFilter[key] }
+        // })
+        // không phân biệt chữ hoa chữ thường
+        queryConditions.push({
+          [key]: { $regex: new RegExp(queryFilter[key], 'i') }
+        })
+      })
+
+    }
     const query = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate(
       [
         {

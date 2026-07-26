@@ -43,9 +43,17 @@ const moveCardToDifferentColumns = async (req, res, next) => {
 const getBoards = async (req, res, next) => {
   try {
     const userId = req.jwtDecoded._id
+
     // page va itemsPerPage dược truyền vào trong query url từ phía FE nên BE sẽ lầy thông qua req.query
     const { page, itemsPerPage } = req.query
-    const results = await boardService.getBoards(userId, page, itemsPerPage)
+
+    const queryFilter = req.query.q || {
+      title: req.query['q[title]'],
+      description: req.query['q[description]']
+    }
+
+
+    const results = await boardService.getBoards(userId, page, itemsPerPage, queryFilter)
     res.status(StatusCodes.OK).json(results)
   } catch (error) {
     next(error)
