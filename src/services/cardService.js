@@ -3,6 +3,7 @@ import ApiError from '../utils/ApiError.js'
 import { cardModel } from '../models/cardModel.js'
 import { columnModel } from '../models/columnModel.js'
 import { CloudinaryProvider } from '~/providers/CloudinaryProvider.js'
+import { CARD_MEMBER_ACTIONS } from '~/utils/constants.js'
 
 const createNew = async (reqBody) => {
   try {
@@ -42,6 +43,10 @@ const update = async (cardId, reqBody, cardCoverFile, userInfo) => {
         commentedAt: Date.now()
       }
       updatedCard = await cardModel.unshiftNewComment(cardId, commentData)
+    } else if (updateData.incomingMemberInfo) {
+      // add hoạc remove thành viên trong card
+      updatedCard = await cardModel.updateMembers(cardId, updateData.incomingMemberInfo)
+
     }
     else {
       // các trường hợp update chung như title description
