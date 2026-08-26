@@ -74,10 +74,3 @@ const START_SERVER = () => {
         process.exit(0)
     }
 })()
-// CONNECT_DB()
-//     .then(() => console.log('Connected to MogoDB'))
-//     .then(() => START_SERVER())
-//     .catch(e => {
-//         console.error(e)
-//         process.exit(0)
-//     })
