@@ -1,8 +1,10 @@
 import { env } from '~/config/environment'
 
 export const WHITELIST_DOMAINS = [
-  'https://trello-client-mu.vercel.app',
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'https://ngotuanviet.id.vn',
+  'https://www.ngotuanviet.id.vn',
+  'https://api.ngotuanviet.id.vn'
   // Không cần localhost nữa vi o file config/cors đã luôn luôn cho phep môi trường
   //dev(env.BUILD_MODE === 'dev')
   // ... vv ví dụ sau này sẽ deploy lên domain chính thức ... vv
