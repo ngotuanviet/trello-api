@@ -45,8 +45,7 @@ const getDetail = async (userId, id) => {
     delete board.cards
     return board
   } catch (error) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Lỗi tìm board mới')
-
+    throw error
   }
 }
 const update = async (boardId, data) => {
