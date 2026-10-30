@@ -2,16 +2,13 @@ FROM node:20
 
 WORKDIR /app
 
-# 1. Kích hoạt Yarn 4 qua Corepack trước
-RUN corepack enable && corepack prepare yarn@4.5.0 --activate
+# Copy dependency definitions
+COPY package.json yarn.lock ./
 
-# 2. Chỉ copy các file cấu hình bắt buộc (dấu * giúp bỏ qua nếu không có file)
-COPY package.json yarn.lock .yarnrc.yml* ./
+# Install dependencies using Yarn 1 (frozen lockfile to ensure stability)
+RUN yarn install --frozen-lockfile
 
-# 3. Cài đặt dependencies
-RUN yarn install
-
-# 4. Copy toàn bộ source code và build
+# Copy source code and build
 COPY . .
 
 RUN yarn build
