@@ -2,6 +2,7 @@ import { env } from '~/config/environment'
 
 export const WHITELIST_DOMAINS = [
   'http://localhost:5173',
+  'https://trello.ngotuanviet.id.vn',
   'https://ngotuanviet.id.vn',
   'https://www.ngotuanviet.id.vn',
   'https://api.ngotuanviet.id.vn'
