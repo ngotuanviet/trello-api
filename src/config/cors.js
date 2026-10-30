@@ -5,6 +5,11 @@ import { WHITELIST_DOMAINS } from '~/utils/constants'
 
 export const corsOptions = {
   origin: (origin, callback) => {
+    // Cho phép các request không có header Origin (same-origin GET trong browser, server-to-server, curl, Postman)
+    if (!origin) {
+      return callback(null, true)
+    }
+
     // Neu moi truờng la local dev thi cho qua luon
     if (env.BUILD_MODE === 'dev') {
       return callback(null, true)
